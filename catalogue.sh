@@ -1,3 +1,4 @@
+cp catalogue.service /etc/systemd/system/catalogue.service
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
 yum install nodejs -y
 useradd roboshop
@@ -10,4 +11,4 @@ npm install
 
 systemctl daemon-reload
 systemctl enable catalogue 
-systemctl start catalogue
+systemctl restart catalogue
