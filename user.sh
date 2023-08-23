@@ -1,5 +1,5 @@
 cp user.service /etc/systemd/system/user.service
-cp user.repo /etc/yum.repos.d/user.repo
+cp mongo.repo /etc/yum.repos.d/mongo.repo
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
 yum install nodejs -y
 useradd roboshop
