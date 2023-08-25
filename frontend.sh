@@ -1,6 +1,6 @@
 source common.sh
 
-log = /tmp/roboshop.log
+log=/tmp/roboshop.log
 
 echo "\e[36m>>>>>>>>>>>>>Install the nginx server<<<<<<<<<<<<<<\e[0m" | tee -a ${log}
 yum install nginx -y &>>${log}
