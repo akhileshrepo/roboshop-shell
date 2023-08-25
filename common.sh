@@ -70,6 +70,7 @@ func_schema_setup() {
 }
 
 func_nodejs() {
+    log=/tmp/roboshop.log
     echo -e "\e[36m>>>>>>>>>>>>  Create MongoDB Repo  <<<<<<<<<<<<\e[0m" | tee -a ${log}
     cp mongo.repo /etc/yum.repos.d/mongo.repo &>>${log}
     func_exit_status
