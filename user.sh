@@ -1,5 +1,5 @@
-component = user
+component=user
+schema_type=mongodb
 source common.sh
-schema_type = mongodb
 
 func_nodejs
