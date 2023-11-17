@@ -1,4 +1,4 @@
-source common.sh
+
 
 echo -e "\e[36m>>>>>>>>>>>>  Install Nginx   <<<<<<<<<<<<\e[0m"
 yum install nginx -y &>>${log}
@@ -25,4 +25,8 @@ echo -e "\e[36m>>>>>>>>>>>>  Extract Application Content  <<<<<<<<<<<<\e[0m"
 unzip /tmp/frontend.zip &>>${log}
 func_exit_status
 
-component=frontend
+
+echo -e "\e[36m>>>>>>>>>>>>  Start Nginx Service  <<<<<<<<<<<<\e[0m"
+systemctl enable nginx &>>${log}
+systemctl restart nginx &>>${log}
+func_exit_status
