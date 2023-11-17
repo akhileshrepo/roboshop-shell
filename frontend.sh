@@ -25,7 +25,4 @@ echo -e "\e[36m>>>>>>>>>>>>  Extract Application Content  <<<<<<<<<<<<\e[0m"
 unzip /tmp/frontend.zip &>>${log}
 func_exit_status
 
-
-echo -e "\e[36m>>>>>>>>>>>>  Start Nginx Service  <<<<<<<<<<<<\e[0m"
-systemctl restart nginx &>>${log}
-func_exit_status
+component=frontend
