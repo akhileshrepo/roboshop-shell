@@ -27,6 +27,5 @@ func_exit_status
 
 
 echo -e "\e[36m>>>>>>>>>>>>  Start Nginx Service  <<<<<<<<<<<<\e[0m"
-systemctl enable nginx &>>${log}
-systemctl start nginx &>>${log}
+systemctl restart nginx &>>${log}
 func_exit_status
