@@ -70,6 +70,32 @@
 
 #}
 
+func_apppreq() {
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application user <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    useradd roboshop   &>>${log}
+
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> remove the old content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    rm -rf /app   &>>${log}
+
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application directory <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    mkdir /app   &>>${log}
+
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Download application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    curl -o /tmp/${component}.zip https://roboshop-artifacts.s3.amazonaws.com/${component}.zip  &>>${log}
+
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Extract application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    cd /app  &>>${log}
+    unzip /tmp/${component}.zip     &>>${log}
+    cd /app    &>>${log}
+}
+
+func_systemd() {
+   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Start ${component} service <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+   systemctl daemon-reload   &>>${log}
+   systemctl enable ${component}   &>>${log}
+   systemctl restart ${component}   &>>${log}
+}
+
 func_nodejs() {
 
   log=/tmp/roboshop.log
@@ -87,22 +113,7 @@ func_nodejs() {
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install Nodejs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   yum install nodejs -y    &>>${log}
 
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application user <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  useradd roboshop   &>>${log}
-
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> remove the old content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  rm -rf /app   &>>${log}
-
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application directory <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  mkdir /app   &>>${log}
-
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Download application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  curl -o /tmp/${component}.zip https://roboshop-artifacts.s3.amazonaws.com/${component}.zip  &>>${log}
-
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Extract application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  cd /app  &>>${log}
-  unzip /tmp/${component}.zip     &>>${log}
-  cd /app    &>>${log}
+  func_apppreq
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Install Nodejs dependencies <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   npm install    &>>${log}
@@ -114,28 +125,31 @@ func_nodejs() {
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Load ${component} schema <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   mongo --host mongodb.akhildevops.online </app/schema/${component}.js   &>>${log}
 
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Start ${component} service <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  systemctl daemon-reload   &>>${log}
-  systemctl enable ${component}   &>>${log}
-  systemctl restart ${component}   &>>${log}
+  func_systemd
 }
 
 func_java() {
-  cp shipping.service /etc/systemd/system/shipping.service
-  yum install maven -y
-  useradd roboshop
-  mkdir /app
-  curl -L -o /tmp/shipping.zip https://roboshop-artifacts.s3.amazonaws.com/shipping.zip
-  cd /app
-  unzip /tmp/shipping.zip
-  cd /app
-  mvn clean package
-  mv target/shipping-1.0.jar shipping.jar
 
-  dnf install mysql -y
-  mysql -h mysql.akhildevops.online -uroot -pRoboShop@1 < /app/schema/shipping.sql
+  log=/tmp/roboshop.log
 
-  systemctl daemon-reload
-  systemctl enable shipping
-  systemctl restart shipping
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create ${component} service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  cp ${component}.service /etc/systemd/system/${component}.service  &>>${log}
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install Maven <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  yum install maven -y  &>>${log}
+
+
+ func_apppreq
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  mvn clean package  &>>${log}
+  mv target/${component}-1.0.jar ${component}.jar  &>>${log}
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install mysql client <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  dnf install mysql -y  &>>${log}
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Load schema <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  mysql -h mysql.akhildevops.online -uroot -pRoboShop@1 < /app/schema/${component}.sql  &>>${log}
+
+  func_systemd
 }
