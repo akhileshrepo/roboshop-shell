@@ -1,7 +1,7 @@
-#component=cart
-#source common.sh
+component=cart
+source common.sh
 
-#func_nodejs
+func_nodejs
 
 
 
