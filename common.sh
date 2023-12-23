@@ -71,6 +71,12 @@
 #}
 
 func_apppreq() {
+
+    log=/tmp/roboshop.log
+
+    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create ${component} service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+    cp ${component}.service /etc/systemd/system/${component}.service &>>${log}
+
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application user <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     useradd roboshop   &>>${log}
 
@@ -90,6 +96,9 @@ func_apppreq() {
 }
 
 func_systemd() {
+
+   log=/tmp/roboshop.log
+
    echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Start ${component} service <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
    systemctl daemon-reload   &>>${log}
    systemctl enable ${component}   &>>${log}
@@ -152,4 +161,20 @@ func_java() {
   mysql -h mysql.akhildevops.online -uroot -pRoboShop@1 < /app/schema/${component}.sql  &>>${log}
 
   func_systemd
+}
+
+func_python() {
+
+  log=/tmp/roboshop.log
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  dnf install python36 gcc python3-devel -y &>>${log}
+
+  func_apppreq
+
+  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  pip3.6 install -r requirements.txt &>>${log}
+
+  func_systemd
+
 }
