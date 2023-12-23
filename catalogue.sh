@@ -9,6 +9,7 @@ log=/tmp/roboshop.log
 echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create Catalogue service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
 cp catalogue.service /etc/systemd/system/catalogue.service &>>${log}
 
+
 echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>  create Mongodb repos  <<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
 cp mongo.repo /etc/yum.repos.d/mongo.repo  &>>${log}
 
