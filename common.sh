@@ -69,6 +69,13 @@
 #  fi
 
 #}
+func_exit_status() {
+  if [ $? -eq 0 ]; then
+    echo -e "\e[31mSUCCESS\e[0m"
+  else
+    echo -e "\e[32mFAILURE\e[0m"
+  fi
+}
 
 func_apppreq() {
 
@@ -76,29 +83,33 @@ func_apppreq() {
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create ${component} service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     cp ${component}.service /etc/systemd/system/${component}.service &>>${log}
-    echo $?
+    func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application user <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-    useradd roboshop   &>>${log}
-    echo $?
+    id roboshop &>>${log}
+    if [ $? -ne 0 ]; then
+      useradd roboshop
+    fi
+
+    func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> remove the old content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     rm -rf /app   &>>${log}
-    echo $?
+    func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> create application directory <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     mkdir /app   &>>${log}
-    echo $?
+    func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Download application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     curl -o /tmp/${component}.zip https://roboshop-artifacts.s3.amazonaws.com/${component}.zip  &>>${log}
-    echo $?
+    func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Extract application content <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
     cd /app  &>>${log}
     unzip /tmp/${component}.zip     &>>${log}
     cd /app    &>>${log}
-    echo $?
+    func_exit_status
 
 }
 
@@ -110,7 +121,7 @@ func_systemd() {
    systemctl daemon-reload   &>>${log}
    systemctl enable ${component}   &>>${log}
    systemctl restart ${component}   &>>${log}
-   echo $?
+   func_exit_status
 }
 
 func_schema_setup() {
@@ -119,21 +130,21 @@ func_schema_setup() {
     if [ "${schema_type}" == "mongodb" ]; then
       echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Install Mongo client<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
       yum install mongodb-org-shell -y    &>>${log}
-      echo $?
+      func_exit_status
 
       echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Load ${component} schema <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
       mongo --host mongodb.akhildevops.online </app/schema/${component}.js   &>>${log}
-      echo $?
+      func_exit_status
     fi
 
     if [ "${schema_type}" == "mysql" ]; then
       echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install mysql client <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
       dnf install mysql -y  &>>${log}
-      echo $?
+      func_exit_status
 
       echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Load schema <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
       mysql -h mysql.akhildevops.online -uroot -pRoboShop@1 < /app/schema/${component}.sql  &>>${log}
-      echo $?
+      func_exit_status
     fi
 }
 
@@ -143,26 +154,26 @@ func_nodejs() {
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create ${component} service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   cp ${component}.service /etc/systemd/system/${component}.service &>>${log}
-  echo $?
+  func_exit_status
 
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>  create Mongodb repos  <<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   cp mongo.repo /etc/yum.repos.d/mongo.repo  &>>${log}
-  echo $?
+  func_exit_status
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>  Install Nodejs Repos  <<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   curl -sL https://rpm.nodesource.com/setup_lts.x | bash  &>>${log}
-  echo $?
+  func_exit_status
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install Nodejs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   yum install nodejs -y    &>>${log}
-  echo $?
+  func_exit_status
 
   func_apppreq
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Install Nodejs dependencies <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   npm install    &>>${log}
-  echo $?
+  func_exit_status
 
   func_schema_setup
 
@@ -175,11 +186,11 @@ func_java() {
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create ${component} service <<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   cp ${component}.service /etc/systemd/system/${component}.service  &>>${log}
-  echo $?
+  func_exit_status
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install Maven <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   yum install maven -y  &>>${log}
-  echo $?
+  func_exit_status
 
 
  func_apppreq
@@ -187,7 +198,7 @@ func_java() {
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   mvn clean package  &>>${log}
   mv target/${component}-1.0.jar ${component}.jar  &>>${log}
-  echo $?
+  func_exit_status
 
   func_schema_setup
 
@@ -200,13 +211,13 @@ func_python() {
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   dnf install python36 gcc python3-devel -y &>>${log}
-  echo $?
+  func_exit_status
 
   func_apppreq
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
   pip3.6 install -r requirements.txt &>>${log}
-  echo $?
+  func_exit_status
 
   func_systemd
 
