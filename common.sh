@@ -205,21 +205,17 @@ func_java() {
 }
 
 func_python() {
-
-  log=/tmp/roboshop.log
-
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  dnf install python36 gcc python3-devel -y &>>${log}
+  echo -e "\e[36m>>>>>>>>>>>>  Build ${component} Service   <<<<<<<<<<<<\e[0m"
+  yum install python36 gcc python3-devel -y &>>${log}
   func_exit_status
 
   func_apppreq
 
-  sed -i "/s/rabbitmq_app_password/${rabbitmq_app_password}/" /etc/systemd/system/${component}.service
+  sed -i "s/rabbitmq_app_password/${rabbitmq_app_password}/" /etc/systemd/system/${component}.service
 
-  echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Build ${component} service <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+  echo -e "\e[36m>>>>>>>>>>>>  Build ${component} Service   <<<<<<<<<<<<\e[0m"
   pip3.6 install -r requirements.txt &>>${log}
   func_exit_status
 
   func_systemd
-
 }
