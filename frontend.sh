@@ -1,5 +1,6 @@
 source common.sh
 
+log=/tmp/roboshop.log
 echo -e "\e[36m>>>>>>>>>>>>  Install Nginx   <<<<<<<<<<<<\e[0m"
 yum install nginx -y &>>${log}
 func_exit_status
