@@ -165,7 +165,7 @@ func_nodejs() {
   func_exit_status
 
   echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>>> Install Nodejs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-  yum install nodejs -y    &>>${log}
+  dnf install nodejs -y   &>>${log}
   func_exit_status
 
   func_apppreq
