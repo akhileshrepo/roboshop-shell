@@ -82,7 +82,7 @@ func_nodejs() {
  func_exit_status
 
   echo -e "\e[36m>>>>>>>>>>>>  Install NodeJS  <<<<<<<<<<<<\e[0m"
-  yum install nodejs -y &>>${log}
+  dnf install nodejs -y &>>${log}
   func_exit_status
 
   func_apppreq
