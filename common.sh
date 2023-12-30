@@ -132,7 +132,7 @@ func_schema_setup() {
       func_exit_status
 
       echo -e "\e[36m>>>>>>>>>>>>>>>>>>>>>> Load ${component} schema <<<<<<<<<<<<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
-      mongo --host mongodb.akhildevops.online </app/schema/${component}.js   &>>${log}
+      mongo --host 172.31.20.225 </app/schema/${component}.js   &>>${log}
       func_exit_status
     fi
 
