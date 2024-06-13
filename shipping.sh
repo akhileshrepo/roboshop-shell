@@ -4,4 +4,3 @@ source common.sh
 
 func_java
 
-app_password=$1
