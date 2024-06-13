@@ -63,7 +63,7 @@ func_schema_setup() {
     func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>  Load Schema   <<<<<<<<<<<<\e[0m"
-    mysql -h mysql.akhildevops.online -uroot ${app_password} < /app/schema/${component}.sql &>>${log}
+    mysql -h mysql.akhildevops.online -uroot -p${app_password} < /app/schema/${component}.sql &>>${log}
     func_exit_status
   fi
 
