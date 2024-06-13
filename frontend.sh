@@ -27,6 +27,7 @@ func_exit_status
 
 
 echo -e "\e[36m>>>>>>>>>>>>  Start Nginx Service  <<<<<<<<<<<<\e[0m" | tee -a /tmp/roboshop.log
+systemctl reset nginx &>>${log}
 systemctl enable nginx &>>${log}
 systemctl restart nginx &>>${log}
 func_exit_status
