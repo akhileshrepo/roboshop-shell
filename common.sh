@@ -53,7 +53,7 @@ func_schema_setup() {
     func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>  Load User Schema  <<<<<<<<<<<<\e[0m"  | tee -a /tmp/roboshop.log
-    mongo --host mongodb.akhildevops.online </app/schema/${component}.js &>>${log}
+    mongo --host mongodb-dev.akhildevops.online </app/schema/${component}.js &>>${log}
     func_exit_status
   fi
 
@@ -63,7 +63,7 @@ func_schema_setup() {
     func_exit_status
 
     echo -e "\e[36m>>>>>>>>>>>>  Load Schema   <<<<<<<<<<<<\e[0m"
-    mysql -h mysql.akhildevops.online -uroot -p${app_password} < /app/schema/${component}.sql &>>${log}
+    mysql -h mysql-dev.akhildevops.online -uroot -p${app_password} < /app/schema/${component}.sql &>>${log}
     func_exit_status
   fi
 
